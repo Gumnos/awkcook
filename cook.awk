@@ -3,6 +3,12 @@ function err(s) {
     print s >> "/dev/stderr"
 }
 
+function rest_of(s) {
+    # when match() finds a prefix-context
+    # return the rest of the line
+    return substr($0, RLENGTH+1)
+}
+
 function emit_front_matter() {
     print "Title:", title
     for (i=0; i<length(tags); i++) print "Tag:", tags[i]
@@ -54,12 +60,12 @@ FNR == 1 {
 reading_front_matter {
     # TODO: parse the front-matter into known notes
     if (match($0, /^title: */)) {
-        title = substr($0, RLENGTH+1)
+        title = rest_of($0)
     } else if (match($0, /^tags:$/)) {
         reading_tags = 1
     } else if (reading_tags) {
         if (match($0, /^[ \t][ \t]*-[ \t]*/)) {
-            tags[length(tags)] = substr($0, RLENGTH+1)
+            tags[length(tags)] = rest_of($0)
         } else reading_tags = 0
     }
 }
