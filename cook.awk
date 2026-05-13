@@ -64,7 +64,6 @@ FNR == 1 {
 }
 
 reading_front_matter {
-    # TODO: parse the front-matter into known notes
     if (match($0, /^title: */)) {
         title = rest_of($0)
         next
