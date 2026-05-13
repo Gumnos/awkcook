@@ -68,6 +68,12 @@ FNR == 1 {
     }
 }
 
+FNR == 1 {
+    # there was no front-matter block
+    # so emit the defaults
+    emit_front_matter()   
+}
+
 reading_front_matter {
     if (match($0, /^title: */)) {
         title = rest_of($0)
@@ -86,3 +92,5 @@ reading_front_matter {
     }
     warn("Unknown front-matter: " $0)
 }
+
+
