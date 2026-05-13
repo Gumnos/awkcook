@@ -11,20 +11,29 @@ function err(s) {
     print "ERR:", s >> "/dev/stderr"
 }
 
+function rstrip(s) {
+    sub(/[ \t][ \t]*$/, "", s)
+    return s
+}
+
 function rest_of(s) {
     # when match() finds a prefix-context
     # return the rest of the line, right-stripped
-    sub(/[ \t][ \t]*$/, "", s)
-    return substr(s, RLENGTH+1)
+    return rstrip(substr(s, RLENGTH+1))
 }
 
 function emit_front_matter() {
     print "Title:", title
     print "Author:", author
-    for (i=0; i<length(tags); i++) print "Tag:", tags[i]
+    print "Tags:"
+    for (i=0; i<length(tags); i++) print " - ", tags[i]
+
+    print "All tags:"
+    for (tag in all_tags) print " - ", tag
 }
 
 BEGIN {
+    USER = ENVIRON["USER"]
     CMD_SHOW = cmd = "show"
     for (i=1; i<ARGC; i++) {
         s = ARGV[i]
@@ -50,7 +59,8 @@ FNR == 1 {
     title = FILENAME
     sub(/.*\//, "", title)
     sub(/\.cook$/, "", title)
-    author = ENVIRON["USER"]
+    author = USER
+    delete tags
 }
 
 /^---$/ {
@@ -86,11 +96,18 @@ reading_front_matter {
         next
     } else if (reading_tags) {
         if (match($0, /^[ \t][ \t]*-[ \t]*/)) {
-            tags[length(tags)] = rest_of($0)
+            tag = rest_of($0)
+            all_tags[tag]
+            tags[length(tags)] = tag
             next
         } else reading_tags = 0
     }
     warn("Unknown front-matter: " $0)
 }
 
+match($0, /--/) {
+    # a comment
+    $0 = substr($0, 1, RSTART-1)
+    $0 = rstrip($0)
+}
 
