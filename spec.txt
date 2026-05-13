@@ -1,0 +1,58 @@
+Ingredients:
+ @[^@]*{}
+ @\w+
+ Add @salt @ground black pepper{} to taste.
+
+ qty in {}
+ Poke holes in @potato{2}
+
+ units add % between quantity and unit:
+ Place @chopped spinach{1%bag} in pot
+ and add @syrup{1/2%tbsp}
+
+Steps: each blank-line-separated paragraph is a step,
+adding a \ at the end includes the blank-line in the step:
+
+  A step
+  the same step
+
+  a different step\
+  with multiple lines
+
+Comments:
+  Inline comments from "--" to EOL
+  Block comments from [- to -]
+
+Metadata:
+  YAML front-matter delineated by --- at the beginning of the file,
+  ending with ---
+
+    ---
+    title: Spaghetti Carbonara
+    tags:
+      - pasta
+      - quick
+      - comfort food
+    ---
+
+Cookware:
+  #[^#]{}
+  #\w+
+
+Timer:
+ anonymous: ~{25%minutes}
+ named: ~eggs{3%minutes}
+
+Notes:
+  > at the beginning of the line
+
+Sections:
+  one more more "=" at the beginning of the line
+  with optional trailing "="
+
+  = Section
+
+Include:
+  like ingredients, but with relative path and without .cook extension:
+
+  Pour @./saurces/hollandaise{150%g} over eggs
