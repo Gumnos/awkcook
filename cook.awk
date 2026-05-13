@@ -1,4 +1,9 @@
 #!/usr/bin/awk -f
+
+# cook.awk: a rough processor for https://cooklang.org file
+# author: Tim Chase
+# copyright: 2026
+
 function warn(s) {
     print "WARN:", s >> "/dev/stderr"
 }
@@ -43,9 +48,9 @@ FNR == 1 {
     reading_front_matter = 0
     reading_tags = 0
     title = FILENAME
-    author = ENVIRON["USER"]
     sub(/.*\//, "", title)
     sub(/\.cook$/, "", title)
+    author = ENVIRON["USER"]
 }
 
 /^---$/ {
