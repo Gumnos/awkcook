@@ -16,6 +16,11 @@ function rstrip(s) {
     return s
 }
 
+function lstrip(s) {
+    sub(/^[ \t][ \t]*/, "", s)
+    return s
+}
+
 function rest_of(s) {
     # when match() finds a prefix-context
     # return the rest of the line, right-stripped
@@ -56,6 +61,7 @@ FNR == 1 {
     # reset state for a new recipe
     reading_front_matter = 0
     reading_tags = 0
+    reading_multiline_comment = 0
     title = FILENAME
     sub(/.*\//, "", title)
     sub(/\.cook$/, "", title)
@@ -105,9 +111,30 @@ reading_front_matter {
     warn("Unknown front-matter: " $0)
 }
 
-match($0, /--/) {
-    # a comment
+match($0, /[ \t]*--/) {
+    # an inline comment
     $0 = substr($0, 1, RSTART-1)
-    $0 = rstrip($0)
 }
 
+{
+    # remove [- ... -] comments
+    gsub(/\[-.*-\]/, "", $0)
+}
+
+reading_multiline_comment {
+
+    if (match($0, /-\]/)) {
+        $0 = substr($0, RSTART+RLENGTH)
+        reading_multiline_comment = 0
+    } else {
+        next
+    }
+}
+
+match($0, /\[-/) {
+    # a comment
+    $0 = substr($0, 1, RSTART-1)
+    reading_multiline_comment = 1
+}
+
+1
