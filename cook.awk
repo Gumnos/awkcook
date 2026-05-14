@@ -28,6 +28,7 @@ function rest_of(s) {
 }
 
 function emit_front_matter() {
+    print "=================================================="
     print "Title:", title
     print "Author:", author
     print "Tags:"
