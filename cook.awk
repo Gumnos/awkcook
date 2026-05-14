@@ -69,12 +69,19 @@ function end_recipe(        s, i, step_number, section_number) {
     print "=============END OF RECIPE========================"
 }
 
+function parse_options(options) {
+    # TODO
+}
+
 BEGIN {
     USER = ENVIRON["USER"]
     CMD_SHOW = cmd = "show"
     MODE_PLAIN = "plain"
     MODE_ANSI = "ansi"
     MODE_HTML = "html"
+    MODE_DEFAULT = MODE_ANSI
+
+    opt_mode = MODE_DEFAULT
     for (i=1; i<ARGC; i++) {
         s = ARGV[i]
         if (i==1) cmd = s
@@ -90,6 +97,7 @@ BEGIN {
         ARGV[i+1] = actual_args[i]
     }
     ARGC = length(actual_args)+1
+    parse_options(options)
 }
 
 FNR == 1 {
