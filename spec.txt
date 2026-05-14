@@ -45,15 +45,15 @@ Timer:
  named: ~eggs{3%minutes}
 
 Notes:
-  > at the beginning of the line
+  [x] > at the beginning of the line
 
 Sections:
-  one more more "=" at the beginning of the line
+  [x] one more more "=" at the beginning of the line
   with optional trailing "="
 
   = Section
 
 Include:
-  like ingredients, but with relative path and without .cook extension:
+  [ ] like ingredients, but with relative path and without .cook extension:
 
   Pour @./saurces/hollandaise{150%g} over eggs

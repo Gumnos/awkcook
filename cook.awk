@@ -38,9 +38,33 @@ function emit_front_matter(        i, tag) {
     for (tag in all_tags) print " - ", tag
 }
 
-function end_recipe() {
+function emit_section(section_number, s) {
+    # TODO
+    print "SECTION" section_number ": ", s
+}
+
+function emit_note(s) {
+    # TODO
+    print "NOTE: ", s
+}
+
+function emit_step(step_number, s) {
+    # TODO
+    print "STEP" step_number ": ", s
+}
+
+function end_recipe(        s, i, step_number, section_number) {
     for (i=1; i<=block_number; i++) {
-        printf("Block%i/%i:\n%s\n", i, block_number, blocks[i])
+        s = blocks[i]
+        if (s ~ /^=/) {
+            sub(/^==*[ \t]*/, "", s)
+            sub(/[ \t*]=*$/, "", s)
+            emit_section(++section_number, s)
+        } else if (match(s, /^>[ \t*]/)) {
+            emit_note(rest_of(s))
+        } else {
+            emit_step(++step_number, s)
+        }
     }
     print "=============END OF RECIPE========================"
 }
@@ -48,6 +72,9 @@ function end_recipe() {
 BEGIN {
     USER = ENVIRON["USER"]
     CMD_SHOW = cmd = "show"
+    MODE_PLAIN = "plain"
+    MODE_ANSI = "ansi"
+    MODE_HTML = "html"
     for (i=1; i<ARGC; i++) {
         s = ARGV[i]
         if (i==1) cmd = s
