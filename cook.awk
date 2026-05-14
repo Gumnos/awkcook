@@ -163,7 +163,9 @@ match($0, /\[-/) {
 {
     # convert a trailing backslash into a newline
     sub(/\\$/, "\n", $0)
-    blocks[block_number] = blocks[block_number] (blocks[block_number] ? " " :"") $0
+    blocks[block_number] = blocks[block_number] ( \
+        blocks[block_number] && !(blocks[block_number] ~ /\n$/) ? " " :"" \
+        ) $0
 }
 
 END {
