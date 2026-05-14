@@ -142,7 +142,7 @@ match($0, /[ \t]*--/) {
 reading_multiline_comment {
 
     if (match($0, /-\]/)) {
-        $0 = substr($0, RSTART+RLENGTH)
+        $0 = substr($0, RSTART+RLENGTH+1)
         reading_multiline_comment = 0
     } else {
         next
