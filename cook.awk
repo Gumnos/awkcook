@@ -27,8 +27,8 @@ function rest_of(s) {
     return rstrip(substr(s, RLENGTH+1))
 }
 
-function emit_front_matter() {
-    print "=================================================="
+function emit_front_matter(        i, tag) {
+    print "=============START OF RECIPE======================"
     print "Title:", title
     print "Author:", author
     print "Tags:"
@@ -36,6 +36,13 @@ function emit_front_matter() {
 
     print "All tags:"
     for (tag in all_tags) print " - ", tag
+}
+
+function end_recipe() {
+    for (i=1; i<=block_number; i++) {
+        printf("Block%i/%i:\n%s\n", i, block_number, blocks[i])
+    }
+    print "=============END OF RECIPE========================"
 }
 
 BEGIN {
@@ -59,15 +66,25 @@ BEGIN {
 }
 
 FNR == 1 {
+    if (FNR != NR) end_recipe()
     # reset state for a new recipe
     reading_front_matter = 0
     reading_tags = 0
     reading_multiline_comment = 0
+    block_number = 1
+    reading_block = 1
     title = FILENAME
     sub(/.*\//, "", title)
     sub(/\.cook$/, "", title)
     author = USER
+    delete cookware
+    delete ingredients
     delete tags
+    delete blocks # each block encountered, whether section or step
+    delete section_indexes # [i] = blocks[n] for section blocks
+    delete section_names # [i] = name for section blocks
+    delete steps_indexes # [i] = blocks[n] for step blocks
+    delete steps_content # [i] = content for step blocks
 }
 
 /^---$/ {
@@ -138,4 +155,17 @@ match($0, /\[-/) {
     reading_multiline_comment = 1
 }
 
-1
+/^$/ {
+    if (blocks[block_number]) ++block_number
+    next
+}
+
+{
+    # convert a trailing backslash into a newline
+    sub(/\\$/, "\n", $0)
+    blocks[block_number] = blocks[block_number] (blocks[block_number] ? " " :"") $0
+}
+
+END {
+    end_recipe()
+}

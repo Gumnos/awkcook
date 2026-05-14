@@ -20,16 +20,17 @@ adding a \ at the end includes the blank-line in the step:
   with multiple lines
 
 Comments:
-  Inline comments from "--" to EOL
-  Block comments from [- to -]
+  [x]  Inline comments from "--" to EOL
+  [x]  Block comments from [- to -]
 
 Metadata:
-  YAML front-matter delineated by --- at the beginning of the file,
+  [x]  YAML front-matter delineated by --- at the beginning of the file,
   ending with ---
 
     ---
-    title: Spaghetti Carbonara
-    tags:
+  [x]    title: Spaghetti Carbonara
+  [x]    author: Grandma
+  [x]    tags:
       - pasta
       - quick
       - comfort food
