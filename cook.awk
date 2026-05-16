@@ -28,19 +28,20 @@ function rest_of(s) {
 }
 
 function emit_front_matter(        i, tag) {
-    print "=============START OF RECIPE======================"
-    print "Title:", title
-    print "Author:", author
-    print "Tags:"
-    for (i=0; i<length(tags); i++) print " - ", tags[i]
+    printf("%s%s%s", TITLE_PRE, title, TITLE_POST)
+    printf("%s%s%s", AUTHOR_PRE, author, AUTHOR_POST)
+    if (length(tags)) {
+        printf("%s", TAGS_PRE)
+        for (i=0; i<length(tags); i++) printf("%s%s%s", TAG_PRE, tags[i], TAG_POST)
+        printf("%s", TAGS_POST)
+    }
 
-    print "All tags:"
-    for (tag in all_tags) print " - ", tag
+#    print "All tags:"
+#    for (tag in all_tags) print " - ", tag
 }
 
 function emit_section(section_number, s) {
-    # TODO
-    print "SECTION" section_number ": ", s
+    printf("%s%s%s", SECTION_TEXT_PRE, s, SECTION_TEXT_POST)
 }
 
 function emit_note(s) {
@@ -48,9 +49,76 @@ function emit_note(s) {
     print "NOTE: ", s
 }
 
-function emit_step(step_number, s) {
+function emit_ingredient(s, qty, units) {
     # TODO
-    print "STEP" step_number ": ", s
+    printf("%s%s", INGREDIENT_PRE, s)
+    if (qty != "") {
+        printf(" (%s", qty)
+        if (units != "") printf(" %s", units)
+        printf(")")
+    }
+    printf("%s", INGREDIENT_POST)
+}
+
+function emit_timer(s, qty, units) {
+    # TODO
+    print "TIMER[" s "]["qty"]["units"]TIMER"
+}
+
+function emit_cookware(s, qty, units) {
+    # TODO
+    print "COOKWARE[" s "]["qty"]["units"]COOKWARE"
+}
+
+function emit_text(s) {
+    # TODO
+    printf("%s", s)
+}
+
+function emit_step(step_number, s,        left, type, rest, item, qty, units) {
+    # TODO
+    #print "STEP" step_number ": ", s
+    rest = s
+    while (match(rest, /[@#~]/)) {
+        left = substr(rest, 1, RSTART-1)
+        type = substr(rest, RSTART, RLENGTH)
+        rest = substr(rest, RSTART+RLENGTH)
+        emit_text(left)
+        qty = units = ""
+        # where does it end?
+        if (match(rest, /[@#~{]/)) {
+            # if it terminates with a "{"
+            # and there's a closing "}"
+            if (substr(rest, RSTART, 1) == "{" && rest ~ /{.*}/) {
+                item = substr(rest, 1, RSTART-1)
+                match(rest, /{.*}/) # this should always match^
+                # 2 = len("{") + len("}"):
+                qty = substr(rest, RSTART+1, RLENGTH-2)
+                if (qty ~ /%/) {
+                    units = qty
+                    sub(/^[^%]*%/, "", units)
+                    sub(/%.*/, "", qty)
+                }
+                rest = substr(rest, RSTART+RLENGTH)
+            } else { # it's just one item
+                item = rest
+                sub(/ .*/, "", item)
+                rest = substr(rest, length(item)+1)
+            }
+            if (type == "@") emit_ingredient(item, qty, units)
+            else if (type == "#") emit_cookware(item, qty, units)
+            else if (type == "~") emit_timer(item, qty, units)
+            else {
+                err("unclosed {")
+                break
+            }
+        } else {
+            item = rest
+            sub(/ .*/, "", item)
+            rest = substr(rest, length(item)+1)
+        }
+    }
+    emit_text(rest)
 }
 
 function end_recipe(        s, i, step_number, section_number) {
@@ -69,26 +137,113 @@ function end_recipe(        s, i, step_number, section_number) {
     print "=============END OF RECIPE========================"
 }
 
-function parse_options(options) {
+function set_mode_plain() {
+    OUTPUT_PRE = OUTPUT_POST = \
+    RECIPE_PRE = RECIPE_POST = \
+    FRONTMATTER_PRE = FRONTMATTER_POST = \
+    TAG_POST = \
+    ""
+
+    TITLE_PRE = "Title: "
+    AUTHOR_PRE = "Author: "
+    TAGS_PRE = "Tags:"
+
+    TITLE_POST = \
+    AUTHOR_POST = \
+    TAGS_POST = \
+    "\n"
+    SECTION_POST = \
+    SECTION_TEXT_POST = \
+    STEP_POST = \
+    "\n\n"
+
+    TAG_PRE = " "
+
+    SECTION_PRE = \
+    SECTION_TEXT_PRE = \
+    STEP_PRE = \
+    TEXT_PRE = \
+    ""
+
+    INGREDIENT_PRE = \
+    TIMER_PRE = \
+    COOKWARE_PRE = \
+    "["
+
+    INGREDIENT_POST = \
+    TIMER_POST = \
+    COOKWARE_POST = \
+    "]"
+}
+
+function set_mode_ansi(      esc) {
     # TODO
+    esc = sprintf("%c", 27)
+    OUTPUT_PRE = OUTPUT_POST = \
+    RECIPE_PRE = RECIPE_POST = \
+    FRONTMATTER_PRE = FRONTMATTER_POST = \
+    TITLE_PRE = TITLE_POST = \
+    AUTHOR_PRE = AUTHOR_POST = \
+    TAGS_PRE = TAGS_POST = \
+    TAG_PRE = TAG_POST = \
+    SECTION_PRE = SECTION_POST = \
+    SECTION_TEXT_PRE = SECTION_TEXT_POST = \
+    STEP_PRE = STEP_POST = \
+    TEXT_PRE = TEXT_POST = \
+    INGREDIENT_PRE = INGREDIENT_POST = \
+    TIMER_PRE = TIMER_POST = \
+    COOKWARE_PRE = COOKWARE_POST = \
+    X_PRE = X_POST = \
+    ""
+}
+function set_mode_html() {
+    # TODO
+    OUTPUT_PRE = OUTPUT_POST = \
+    RECIPE_PRE = RECIPE_POST = \
+    FRONTMATTER_PRE = FRONTMATTER_POST = \
+    TITLE_PRE = TITLE_POST = \
+    AUTHOR_PRE = AUTHOR_POST = \
+    TAGS_PRE = TAGS_POST = \
+    TAG_PRE = TAG_POST = \
+    SECTION_PRE = SECTION_POST = \
+    SECTION_TEXT_PRE = SECTION_TEXT_POST = \
+    STEP_PRE = STEP_POST = \
+    TEXT_PRE = TEXT_POST = \
+    INGREDIENT_PRE = INGREDIENT_POST = \
+    TIMER_PRE = TIMER_POST = \
+    COOKWARE_PRE = COOKWARE_POST = \
+    X_PRE = X_POST = \
+    ""
+}
+
+function set_mode(mode) {
+    if (mode == OUTPUT_PLAIN) set_mode_plain()
+    else if (mode == OUTPUT_ANSI) set_mode_ansi()
+    else if (mode == OUTPUT_HTML) set_mode_html()
+}
+
+function parse_options(options,        i) {
+    for (i in options) {
+        # print "Option", i, options[i]
+    }
 }
 
 BEGIN {
     USER = ENVIRON["USER"]
     CMD_SHOW = cmd = "show"
-    MODE_PLAIN = "plain"
-    MODE_ANSI = "ansi"
-    MODE_HTML = "html"
-    MODE_DEFAULT = MODE_ANSI
+    OUTPUT_PLAIN = "plain"
+    OUTPUT_ANSI = "ansi"
+    OUTPUT_HTML = "html"
+    OUTPUT_DEFAULT = OUTPUT_PLAIN
 
-    opt_mode = MODE_DEFAULT
+    opt_mode = OUTPUT_DEFAULT
     for (i=1; i<ARGC; i++) {
         s = ARGV[i]
-        if (i==1) cmd = s
-        else if (s ~ /^-/) {
+        if (s ~ /^-/) {
             options[length(options)] = s
         } else {
-            actual_args[length(actual_args)] = s
+            if (i==1) cmd = s
+            else actual_args[length(actual_args)] = s
         }
     }
     # reset the command-line arguments
@@ -98,6 +253,7 @@ BEGIN {
     }
     ARGC = length(actual_args)+1
     parse_options(options)
+    set_mode(opt_mode)
 }
 
 FNR == 1 {
