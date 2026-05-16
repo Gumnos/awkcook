@@ -50,7 +50,6 @@ function emit_note(s) {
 }
 
 function emit_ingredient(s, qty, units) {
-    # TODO
     printf("%s%s", INGREDIENT_PRE, s)
     if (qty != "") {
         printf(" (%s", qty)
@@ -61,13 +60,24 @@ function emit_ingredient(s, qty, units) {
 }
 
 function emit_timer(s, qty, units) {
-    # TODO
-    print "TIMER[" s "]["qty"]["units"]TIMER"
+    # TODO better deal with empty timer-names
+    printf("%s%s", TIMER_PRE, s)
+    if (qty != "") {
+        printf(" (%s", qty)
+        if (units != "") printf(" %s", units)
+        printf(")")
+    }
+    printf("%s", TIMER_POST)
 }
 
 function emit_cookware(s, qty, units) {
-    # TODO
-    print "COOKWARE[" s "]["qty"]["units"]COOKWARE"
+    printf("%s%s", COOKWARE_PRE, s)
+    if (qty != "") {
+        printf(" (%s", qty)
+        if (units != "") printf(" %s", units)
+        printf(")")
+    }
+    printf("%s", COOKWARE_POST)
 }
 
 function emit_text(s) {
@@ -79,6 +89,7 @@ function emit_step(step_number, s,        left, type, rest, item, qty, units) {
     # TODO
     #print "STEP" step_number ": ", s
     rest = s
+    printf("%s", STEP_PRE)
     while (match(rest, /[@#~]/)) {
         left = substr(rest, 1, RSTART-1)
         type = substr(rest, RSTART, RLENGTH)
@@ -119,6 +130,7 @@ function emit_step(step_number, s,        left, type, rest, item, qty, units) {
         }
     }
     emit_text(rest)
+    printf("%s", STEP_POST)
 }
 
 function end_recipe(        s, i, step_number, section_number) {
