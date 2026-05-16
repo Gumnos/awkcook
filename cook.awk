@@ -126,6 +126,9 @@ function emit_step(step_number, s,        left, type, rest, item, qty, units) {
         } else {
             item = rest
             sub(/ .*/, "", item)
+            if (type == "@") emit_ingredient(item, qty, units)
+            else if (type == "#") emit_cookware(item, qty, units)
+            else if (type == "~") emit_timer(item, qty, units)
             rest = substr(rest, length(item)+1)
         }
     }
