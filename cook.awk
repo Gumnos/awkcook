@@ -81,7 +81,6 @@ function emit_cookware(s, qty, units) {
 }
 
 function emit_text(s) {
-    # TODO
     printf("%s", s)
 }
 
@@ -143,13 +142,14 @@ function end_recipe(        s, i, step_number, section_number) {
             sub(/^==*[ \t]*/, "", s)
             sub(/[ \t*]=*$/, "", s)
             emit_section(++section_number, s)
+            step_number = 0 # reset step-number per section
         } else if (match(s, /^>[ \t*]/)) {
             emit_note(rest_of(s))
         } else {
             emit_step(++step_number, s)
         }
     }
-    print "=============END OF RECIPE========================"
+    printf("%s", RECIPE_POST)
 }
 
 function set_mode_plain() {
@@ -191,26 +191,53 @@ function set_mode_plain() {
     "]"
 }
 
-function set_mode_ansi(      esc) {
-    # TODO
-    esc = sprintf("%c", 27)
-    OUTPUT_PRE = OUTPUT_POST = \
-    RECIPE_PRE = RECIPE_POST = \
-    FRONTMATTER_PRE = FRONTMATTER_POST = \
-    TITLE_PRE = TITLE_POST = \
-    AUTHOR_PRE = AUTHOR_POST = \
-    TAGS_PRE = TAGS_POST = \
-    TAG_PRE = TAG_POST = \
-    SECTION_PRE = SECTION_POST = \
-    SECTION_TEXT_PRE = SECTION_TEXT_POST = \
-    STEP_PRE = STEP_POST = \
-    TEXT_PRE = TEXT_POST = \
-    INGREDIENT_PRE = INGREDIENT_POST = \
-    TIMER_PRE = TIMER_POST = \
-    COOKWARE_PRE = COOKWARE_POST = \
-    X_PRE = X_POST = \
-    ""
+function set_mode_ansi(      CSI,\
+        RED, GREEN, BLUE, \
+        YELLOW, CYAN, MAGENTA, \
+        BRIGHT_RED, BRIGHT_GREEN, BRIGHT_BLUE, \
+        BRIGHT_YELLOW, BRIGHT_CYAN, BRIGHT_MAGENTA, \
+        WHITE, BRIGHT_WHITE, NORMAL) {
+    # define constants
+    CSI = sprintf("%c[", 27)
+    NORMAL = CSI "0m"
+    RED = CSI "31m"     ; BRIGHT_RED = CSI "1;31m"
+    GREEN = CSI "32m"   ; BRIGHT_GREEN = CSI "1;32m"
+    YELLOW = CSI "33m"  ; BRIGHT_YELLOW = CSI "1;33m"
+    BLUE = CSI "34m"    ; BRIGHT_BLUE = CSI "1;34m"
+    MAGENTA = CSI "35m" ; BRIGHT_MAGENTA = CSI "1;35m"
+    CYAN = CSI "36m"    ; BRIGHT_CYAN = CSI "1;36m"
+    WHITE = CSI "37m"   ; BRIGHT_WHITE = CSI "1;37m"
+    set_mode_plain() # get defaults
+#    OUTPUT_PRE = WHITE OUTPUT_PRE
+#    OUTPUT_POST = OUTPUT_POST NORMAL
+#    RECIPE_PRE = WHITE RECIPE_PRE
+#    RECIPE_POST = RECIPE_POST NORMAL
+#    FRONTMATTER_PRE = WHITE FRONTMATTER_PRE
+#    FRONTMATTER_POST = FRONTMATTER_POST NORMAL
+    TITLE_PRE = BRIGHT_BLUE TITLE_PRE NORMAL
+#    TITLE_POST = TITLE_POST NORMAL
+    AUTHOR_PRE = BRIGHT_BLUE AUTHOR_PRE NORMAL
+#    AUTHOR_POST = AUTHOR_POST NORMAL
+    TAGS_PRE = BRIGHT_BLUE TAGS_PRE NORMAL
+#    TAGS_POST = TAGS_POST NORMAL
+#    TAG_PRE = WHITE TAG_PRE
+#    TAG_POST = TAG_POST NORMAL
+#    SECTION_PRE = WHITE SECTION_PRE
+#    SECTION_POST = SECTION_POST NORMAL
+    SECTION_TEXT_PRE = BRIGHT_WHITE SECTION_TEXT_PRE
+    SECTION_TEXT_POST = SECTION_TEXT_POST NORMAL
+#    STEP_PRE = WHITE STEP_PRE
+#    STEP_POST = STEP_POST NORMAL
+#    TEXT_PRE = WHITE TEXT_PRE
+#    TEXT_POST = TEXT_POST NORMAL
+    INGREDIENT_PRE = BRIGHT_CYAN INGREDIENT_PRE
+    INGREDIENT_POST = INGREDIENT_POST NORMAL
+    TIMER_PRE = BRIGHT_YELLOW TIMER_PRE
+    TIMER_POST = TIMER_POST NORMAL
+    COOKWARE_PRE = BRIGHT_GREEN COOKWARE_PRE
+    COOKWARE_POST = COOKWARE_POST NORMAL
 }
+
 function set_mode_html() {
     # TODO
     OUTPUT_PRE = OUTPUT_POST = \
@@ -249,7 +276,7 @@ BEGIN {
     OUTPUT_PLAIN = "plain"
     OUTPUT_ANSI = "ansi"
     OUTPUT_HTML = "html"
-    OUTPUT_DEFAULT = OUTPUT_PLAIN
+    OUTPUT_DEFAULT = OUTPUT_ANSI
 
     opt_mode = OUTPUT_DEFAULT
     for (i=1; i<ARGC; i++) {
@@ -283,9 +310,19 @@ FNR == 1 {
     sub(/.*\//, "", title)
     sub(/\.cook$/, "", title)
     author = USER
+
     delete cookware
+    delete cookware_qty
+    delete cookware_units
+
     delete ingredients
+    delete ingredients_qty
+    delete ingredients_units
+
     delete tags
+    delete tags_qty
+    delete tags_units
+
     delete blocks # each block encountered, whether section or step
     delete section_indexes # [i] = blocks[n] for section blocks
     delete section_names # [i] = name for section blocks
