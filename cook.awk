@@ -101,7 +101,7 @@ function emit_step(step_number, s,        left, type, rest, item, qty, units) {
             # and there's a closing "}"
             if (substr(rest, RSTART, 1) == "{" && rest ~ /{.*}/) {
                 item = substr(rest, 1, RSTART-1)
-                match(rest, /{.*}/) # this should always match^
+                match(rest, /{[^}]*}/) # this should always match^
                 # 2 = len("{") + len("}"):
                 qty = substr(rest, RSTART+1, RLENGTH-2)
                 if (qty ~ /%/) {
