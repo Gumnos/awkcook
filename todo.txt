@@ -1,0 +1,2 @@
+add support for included recipes (enqueue them as the next file)
+add support for HTML-fragment output
