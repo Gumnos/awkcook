@@ -28,6 +28,7 @@ function rest_of(s) {
 }
 
 function emit_front_matter(        i, tag) {
+    printf("%s", FRONTMATTER_PRE)
     printf("%s%s%s", TITLE_PRE, title, TITLE_POST)
     printf("%s%s%s", AUTHOR_PRE, author, AUTHOR_POST)
     if (length(tags)) {
@@ -38,6 +39,7 @@ function emit_front_matter(        i, tag) {
 
 #    print "All tags:"
 #    for (tag in all_tags) print " - ", tag
+    printf("%s", FRONTMATTER_POST)
 }
 
 function emit_section(section_number, s) {
@@ -60,14 +62,15 @@ function emit_ingredient(s, qty, units) {
 }
 
 function emit_timer(s, qty, units) {
-    # TODO better deal with empty timer-names
-    printf("%s%s", TIMER_PRE, s)
+    printf("%s%s", TIMER_PRE, (s != "" ? s " (" : ""))
     if (qty != "") {
-        printf(" (%s", qty)
+        printf("%s", qty)
         if (units != "") printf(" %s", units)
-        printf(")")
     }
-    printf("%s", TIMER_POST)
+    if (s != "") {
+        printf("%s (", s)
+    }
+    printf("%s%s", (s != "" ? ")" : ""),  TIMER_POST)
 }
 
 function emit_cookware(s, qty, units) {
@@ -155,7 +158,7 @@ function end_recipe(        s, i, step_number, section_number) {
 function set_mode_plain() {
     OUTPUT_PRE = OUTPUT_POST = \
     RECIPE_PRE = RECIPE_POST = \
-    FRONTMATTER_PRE = FRONTMATTER_POST = \
+    FRONTMATTER_PRE = \
     TAG_POST = \
     ""
 
@@ -167,6 +170,8 @@ function set_mode_plain() {
     AUTHOR_POST = \
     TAGS_POST = \
     "\n"
+
+    FRONTMATTER_POST = \
     SECTION_POST = \
     SECTION_TEXT_POST = \
     STEP_POST = \
