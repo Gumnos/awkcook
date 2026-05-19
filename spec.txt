@@ -1,3 +1,5 @@
+[Some basic notes extracted from the spec]
+
 Ingredients:
  @[^@]*{}
  @\w+
@@ -28,9 +30,9 @@ Metadata:
   ending with ---
 
     ---
-  [x]    title: Spaghetti Carbonara
-  [x]    author: Grandma
-  [x]    tags:
+  [x]title: Spaghetti Carbonara
+  [x]author: Grandma
+  [x]tags:
       - pasta
       - quick
       - comfort food
