@@ -27,10 +27,17 @@ function rest_of(s) {
     return rstrip(substr(s, RLENGTH+1))
 }
 
-function emit_front_matter(        i, tag) {
+function emit_front_matter(        i, field, tag) {
     printf("%s", FRONTMATTER_PRE)
-    printf("%s%s%s", TITLE_PRE, title, TITLE_POST)
-    printf("%s%s%s", AUTHOR_PRE, author, AUTHOR_POST)
+    # emit them in preference-order
+    for (i=1; i<=length(expected_metadata_priorities); i++) {
+        field = expected_metadata_priorities[i]
+        if (field in metadata) {
+            printf("%s%s%s%s%s%s", \
+                METADATALABEL_PRE, field, METADATALABEL_POST, \
+                METADATA_PRE, metadata[field], METADATA_POST)
+        }
+    }
     if (length(tags)) {
         printf("%s", TAGS_PRE)
         for (i=0; i<length(tags); i++) printf("%s%s%s", TAG_PRE, tags[i], TAG_POST)
@@ -159,15 +166,15 @@ function set_mode_plain() {
     OUTPUT_PRE = OUTPUT_POST = \
     RECIPE_PRE = RECIPE_POST = \
     FRONTMATTER_PRE = \
+    METADATALABEL_PRE = \
+    METADATA_PRE = \
     TAG_POST = \
     ""
 
-    TITLE_PRE = "Title: "
-    AUTHOR_PRE = "Author: "
-    TAGS_PRE = "Tags:"
+    TAGS_PRE = "TAGS:"
+    METADATALABEL_POST = ": "
 
-    TITLE_POST = \
-    AUTHOR_POST = \
+    METADATA_POST = \
     TAGS_POST = \
     "\n"
 
@@ -212,6 +219,7 @@ function set_mode_ansi(      CSI,\
     MAGENTA = CSI "35m" ; BRIGHT_MAGENTA = CSI "1;35m"
     CYAN = CSI "36m"    ; BRIGHT_CYAN = CSI "1;36m"
     WHITE = CSI "37m"   ; BRIGHT_WHITE = CSI "1;37m"
+
     set_mode_plain() # get defaults
 #    OUTPUT_PRE = WHITE OUTPUT_PRE
 #    OUTPUT_POST = OUTPUT_POST NORMAL
@@ -219,10 +227,10 @@ function set_mode_ansi(      CSI,\
 #    RECIPE_POST = RECIPE_POST NORMAL
 #    FRONTMATTER_PRE = WHITE FRONTMATTER_PRE
 #    FRONTMATTER_POST = FRONTMATTER_POST NORMAL
-    TITLE_PRE = BRIGHT_BLUE TITLE_PRE NORMAL
-#    TITLE_POST = TITLE_POST NORMAL
-    AUTHOR_PRE = BRIGHT_BLUE AUTHOR_PRE NORMAL
-#    AUTHOR_POST = AUTHOR_POST NORMAL
+    METADATALABEL_PRE = BRIGHT_BLUE METADATALABEL_PRE
+    METADATALABEL_POST = METADATALABEL_POST NORMAL
+    METADATA_PRE = WHITE METADATA_PRE
+    METADATA_POST = METADATA_POST NORMAL
     TAGS_PRE = BRIGHT_BLUE TAGS_PRE NORMAL
 #    TAGS_POST = TAGS_POST NORMAL
 #    TAG_PRE = WHITE TAG_PRE
@@ -248,8 +256,8 @@ function set_mode_html() {
     OUTPUT_PRE = OUTPUT_POST = \
     RECIPE_PRE = RECIPE_POST = \
     FRONTMATTER_PRE = FRONTMATTER_POST = \
-    TITLE_PRE = TITLE_POST = \
-    AUTHOR_PRE = AUTHOR_POST = \
+    METADATALABEL_PRE = METADATALABEL_POST = \
+    METADATA_PRE = METADATA_POST = \
     TAGS_PRE = TAGS_POST = \
     TAG_PRE = TAG_POST = \
     SECTION_PRE = SECTION_POST = \
@@ -301,6 +309,17 @@ BEGIN {
     ARGC = length(actual_args)+1
     parse_options(options)
     set_mode(opt_mode)
+
+    # known metadata
+    split( \
+        "TITLE AUTHOR SERVINGS SERVES YIELD "\
+        "COURSE TIME DURATION PREP COOK "\
+        "DIFFICULTY CUISINE CATEGORY DIET IMAGE "\
+        "LOCALE SOURCE INTRODUCTION DESCRIPTION "\
+        , expected_metadata_priorities)
+    for (i=1; i<length(expected_metadata_priorities); i++) {
+        expected_metadata[expected_metadata_priorities[i]]
+    }
 }
 
 FNR == 1 {
@@ -314,7 +333,9 @@ FNR == 1 {
     title = FILENAME
     sub(/.*\//, "", title)
     sub(/\.cook$/, "", title)
-    author = USER
+    delete metadata
+    metadata["TITLE"] = title
+    metadata["AUTHOR"] = USER
 
     delete cookware
     delete cookware_qty
@@ -357,24 +378,26 @@ FNR == 1 {
 }
 
 reading_front_matter {
-    if (match($0, /^title: */)) {
-        title = rest_of($0)
-        next
-    } else if (match($0, /^author: */)) {
-        author = rest_of($0)
-        next
-    } else if (match($0, /^tags:$/)) {
+    uc = toupper($0)
+    if (match(uc, /^TAGS:$/)) {
         reading_tags = 1
         next
     } else if (reading_tags) {
-        if (match($0, /^[ \t][ \t]*-[ \t]*/)) {
+        if (match(uc, /^[ \t][ \t]*-[ \t]*/)) {
             tag = rest_of($0)
             all_tags[tag]
             tags[length(tags)] = tag
             next
         } else reading_tags = 0
+    } else {
+        if (match(uc, /^[A-Z][A-Z]*: */)) {
+            field = substr(uc, 1, RLENGTH-2)
+            if (field in expected_metadata) {
+                metadata[field] = rest_of($0)
+            }
+            next
+        } else warn("Unknown front-matter: " $0)
     }
-    warn("Unknown front-matter: " $0)
 }
 
 match($0, /[ \t]*--/) {
