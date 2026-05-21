@@ -174,11 +174,11 @@ function set_mode_plain() {
     TAGS_PRE = "TAGS:"
     METADATALABEL_POST = ": "
 
+    FRONTMATTER_POST = \
     METADATA_POST = \
     TAGS_POST = \
     "\n"
 
-    FRONTMATTER_POST = \
     SECTION_POST = \
     SECTION_TEXT_POST = \
     STEP_POST = \
