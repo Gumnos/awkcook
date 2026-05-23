@@ -441,6 +441,23 @@ match($0, /\[-/) {
         ) $0
 }
 
+/@\.*\/[^@#~{]*{.*}/ {
+    # we have an included file
+    s = $0
+    while (match(s, /@\.*\/[^@#~{]*{/)) {
+        path = substr(s, RSTART+1, RLENGTH-2)
+        s = substr(s, RSTART+RLENGTH+1)
+        # have we already enqueued this sub-recipe?
+        found = 0
+        for (i=1; i<ARGC; i++) {
+            if (found = (ARGV[i] == path)) break
+        }
+        if (!found) {
+            ARGV[ARGC++] = path
+        }
+    }
+}
+
 END {
     end_recipe()
 }
