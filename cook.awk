@@ -323,6 +323,8 @@ BEGIN {
 }
 
 FNR == 1 {
+    if (FILENAME in seen) nextfile
+    seen[FILENAME]
     if (FNR != NR) end_recipe()
     # reset state for a new recipe
     reading_front_matter = 0
