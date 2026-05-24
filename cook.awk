@@ -58,14 +58,21 @@ function emit_note(s) {
     print "NOTE: ", s
 }
 
-function emit_ingredient(s, qty, units) {
-    printf("%s%s", INGREDIENT_PRE, s)
+function emit_ingredient(s, qty, units,        i, output, found) {
+    printf("%s%s", INGREDIENT_INLINE_PRE, s)
+    output = s
     if (qty != "") {
-        printf(" (%s", qty)
-        if (units != "") printf(" %s", units)
-        printf(")")
+        output = output sprintf(" (%s", qty)
+        if (units != "") output = output sprintf(" %s", units)
+        output = output ")"
     }
-    printf("%s", INGREDIENT_POST)
+    found = 0
+    for (i in ingredients) {
+        if (found = (ingredients[i] == output)) break
+    }
+    if (!found) ingredients[length(ingredients)] = output
+    printf("%s", output)
+    printf("%s", INGREDIENT_INLINE_POST)
 }
 
 function emit_timer(s, qty, units) {
@@ -81,13 +88,13 @@ function emit_timer(s, qty, units) {
 }
 
 function emit_cookware(s, qty, units) {
-    printf("%s%s", COOKWARE_PRE, s)
+    printf("%s%s", COOKWARE_ITEM_PRE, s)
     if (qty != "") {
         printf(" (%s", qty)
         if (units != "") printf(" %s", units)
         printf(")")
     }
-    printf("%s", COOKWARE_POST)
+    printf("%s", COOKWARE_ITEM_POST)
 }
 
 function emit_text(s) {
@@ -159,6 +166,21 @@ function end_recipe(        s, i, step_number, section_number) {
             emit_step(++step_number, s)
         }
     }
+    if (length(ingredients)) {
+        printf("%s", INGREDIENT_LIST_PRE)
+        for (i=0; i<length(ingredients); i++) {
+            printf("%s%s%s", INGREDIENT_PRE, ingredients[i] , INGREDIENT_POST)
+        }
+        printf("%s", INGREDIENT_LIST_POST)
+    }
+#    if (length(cookware)) {
+#        printf("%s", COOKWARE_PRE)
+#        for (i=1; i<=length(cookware); i++) {
+#            printf("%s%s", INGREDIENT_INLINE_PRE, cookware[i])
+#            if (
+#        }
+#        printf("%s", COOKWARE_POST)
+#    }
     printf("%s", RECIPE_POST)
 }
 
@@ -172,13 +194,19 @@ function set_mode_plain() {
     ""
 
     TAGS_PRE = "TAGS:"
+    INGREDIENT_LIST_PRE = "Ingredients:\n"
+    COOKWARE_PRE = "Cookware:\n"
     METADATALABEL_POST = ": "
 
     FRONTMATTER_POST = \
     METADATA_POST = \
     TAGS_POST = \
+    INGREDIENT_LIST_POST = \
+    INGREDIENT_POST = \
+    COOKWARE_POST = \
     "\n"
 
+    INGREDIENT_LIST_POST = \
     SECTION_POST = \
     SECTION_TEXT_POST = \
     STEP_POST = \
@@ -192,14 +220,18 @@ function set_mode_plain() {
     TEXT_PRE = \
     ""
 
-    INGREDIENT_PRE = \
-    TIMER_PRE = \
     COOKWARE_PRE = \
+    INGREDIENT_PRE = \
+    " - "
+
+    INGREDIENT_INLINE_PRE = \
+    TIMER_PRE = \
+    COOKWARE_ITEM_PRE = \
     "["
 
-    INGREDIENT_POST = \
+    INGREDIENT_INLINE_POST = \
     TIMER_POST = \
-    COOKWARE_POST = \
+    COOKWARE_ITEM_POST = \
     "]"
 }
 
@@ -243,12 +275,16 @@ function set_mode_ansi(      CSI,\
 #    STEP_POST = STEP_POST NORMAL
 #    TEXT_PRE = WHITE TEXT_PRE
 #    TEXT_POST = TEXT_POST NORMAL
-    INGREDIENT_PRE = BRIGHT_CYAN INGREDIENT_PRE
-    INGREDIENT_POST = INGREDIENT_POST NORMAL
+    INGREDIENT_LIST_PRE = BRIGHT_CYAN INGREDIENT_LIST_PRE NORMAL
+#    INGREDIENT_LIST_POST = INGREDIENT_LIST_POST
+    INGREDIENT_PRE = INGREDIENT_PRE CYAN
+    INGREDIENT_POST = NORMAL INGREDIENT_POST
+    INGREDIENT_INLINE_PRE = BRIGHT_CYAN INGREDIENT_INLINE_PRE
+    INGREDIENT_INLINE_POST = INGREDIENT_INLINE_POST NORMAL
     TIMER_PRE = BRIGHT_YELLOW TIMER_PRE
     TIMER_POST = TIMER_POST NORMAL
-    COOKWARE_PRE = BRIGHT_GREEN COOKWARE_PRE
-    COOKWARE_POST = COOKWARE_POST NORMAL
+    COOKWARE_ITEM_PRE = BRIGHT_GREEN COOKWARE_ITEM_PRE
+    COOKWARE_ITEM_POST = COOKWARE_ITEM_POST NORMAL
 }
 
 function set_mode_html() {
@@ -264,7 +300,10 @@ function set_mode_html() {
     SECTION_TEXT_PRE = SECTION_TEXT_POST = \
     STEP_PRE = STEP_POST = \
     TEXT_PRE = TEXT_POST = \
+    INGREDIENT_LIST_PRE = INGREDIENT_LIST_POST = \
     INGREDIENT_PRE = INGREDIENT_POST = \
+    INGREDIENT_INLINE_PRE = INGREDIENT_INLINE_POST = \
+    COOKWARE_ITEM_PRE = COOKWARE_ITEM_POST = \
     TIMER_PRE = TIMER_POST = \
     COOKWARE_PRE = COOKWARE_POST = \
     X_PRE = X_POST = \
@@ -339,17 +378,15 @@ FNR == 1 {
     metadata["TITLE"] = title
     metadata["AUTHOR"] = USER
 
-    delete cookware
-    delete cookware_qty
-    delete cookware_units
+    delete cookware # [i] = cookware
+    delete cookware_qty # [cookware, cookware_qty[cookware, 0]] = qty
+    delete cookware_units # [cookware, cookware[cookware, 0]] = units
 
-    delete ingredients
-    delete ingredients_qty
-    delete ingredients_units
+    delete ingredients # [i] = ingredient
+    delete ingredients_qty # [ingredient, ingredient_qty[ingredient, 0]] = qty
+    delete ingredients_units # [ingredient, ingredient[ingredient, 0]] = units
 
     delete tags
-    delete tags_qty
-    delete tags_units
 
     delete blocks # each block encountered, whether section or step
     delete section_indexes # [i] = blocks[n] for section blocks
