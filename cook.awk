@@ -59,10 +59,10 @@ function emit_note(s) {
 }
 
 function emit_ingredient(s, qty, units,        i, output, found) {
-    printf("%s%s", INGREDIENT_INLINE_PRE, s)
+    printf("%s", INGREDIENT_INLINE_PRE)
     output = s
     if (qty != "") {
-        output = output sprintf(" (%s", qty)
+        output = output " (" qty
         if (units != "") output = output sprintf(" %s", units)
         output = output ")"
     }
