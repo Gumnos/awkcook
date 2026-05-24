@@ -204,13 +204,11 @@ function set_mode_plain() {
     INGREDIENT_LIST_POST = \
     INGREDIENT_POST = \
     COOKWARE_POST = \
-    "\n"
-
     INGREDIENT_LIST_POST = \
     SECTION_POST = \
     SECTION_TEXT_POST = \
     STEP_POST = \
-    "\n\n"
+    "\n"
 
     TAG_PRE = " "
 
