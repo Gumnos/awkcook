@@ -1,2 +1,3 @@
 add support for HTML-fragment output
-gather emitted ingredients/cookware and emit the lists at the end
+gather emitted ingredients and emit the lists at the end
+gather emitted cookware and emit the lists at the end
