@@ -76,15 +76,18 @@ function emit_ingredient(s, qty, units,        i, output, found) {
 }
 
 function emit_timer(s, qty, units) {
-    printf("%s%s", TIMER_PRE, (s != "" ? s " (" : ""))
+    printf("%s", TIMER_PRE)
+    if (s != "") {
+        printf("%s (", s)
+    }
     if (qty != "") {
         printf("%s", qty)
         if (units != "") printf(" %s", units)
     }
     if (s != "") {
-        printf("%s (", s)
+        printf(")")
     }
-    printf("%s%s", (s != "" ? ")" : ""),  TIMER_POST)
+    printf("%s", TIMER_POST)
 }
 
 function emit_cookware(s, qty, units) {
