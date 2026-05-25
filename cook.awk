@@ -92,6 +92,18 @@ function emit_timer(s, qty, units) {
 
 function emit_cookware(s, qty, units) {
     printf("%s%s", COOKWARE_ITEM_PRE, s)
+    output = s
+    if (qty != "") {
+        output = output " (" qty
+        if (units != "") output = output sprintf(" %s", units)
+        output = output ")"
+    }
+    found = 0
+    for (i in cookware) {
+        if (found = (cookware[i] == output)) break
+    }
+    if (!found) cookware[length(cookware)] = output
+    printf("%s", output)
     if (qty != "") {
         printf(" (%s", qty)
         if (units != "") printf(" %s", units)
