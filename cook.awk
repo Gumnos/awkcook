@@ -90,8 +90,8 @@ function emit_timer(s, qty, units) {
     printf("%s", TIMER_POST)
 }
 
-function emit_cookware(s, qty, units) {
-    printf("%s%s", COOKWARE_ITEM_PRE, s)
+function emit_cookware(s, qty, units,        i, output, found) {
+    printf("%s", COOKWARE_ITEM_PRE)
     output = s
     if (qty != "") {
         output = output " (" qty
@@ -104,11 +104,6 @@ function emit_cookware(s, qty, units) {
     }
     if (!found) cookware[length(cookware)] = output
     printf("%s", output)
-    if (qty != "") {
-        printf(" (%s", qty)
-        if (units != "") printf(" %s", units)
-        printf(")")
-    }
     printf("%s", COOKWARE_ITEM_POST)
 }
 
@@ -188,14 +183,13 @@ function end_recipe(        s, i, step_number, section_number) {
         }
         printf("%s", INGREDIENT_LIST_POST)
     }
-#    if (length(cookware)) {
-#        printf("%s", COOKWARE_PRE)
-#        for (i=1; i<=length(cookware); i++) {
-#            printf("%s%s", INGREDIENT_INLINE_PRE, cookware[i])
-#            if (
-#        }
-#        printf("%s", COOKWARE_POST)
-#    }
+    if (length(cookware)) {
+        printf("%s", COOKWARE_LIST_PRE)
+        for (i=0; i<length(cookware); i++) {
+            printf("%s%s%s", COOKWARE_PRE, cookware[i], COOKWARE_POST)
+        }
+        printf("%s", COOKWARE_LIST_POST)
+    }
     printf("%s", RECIPE_POST)
 }
 
@@ -210,7 +204,7 @@ function set_mode_plain() {
 
     TAGS_PRE = "TAGS:"
     INGREDIENT_LIST_PRE = "Ingredients:\n"
-    COOKWARE_PRE = "Cookware:\n"
+    COOKWARE_LIST_PRE = "Cookware:\n"
     METADATALABEL_POST = ": "
 
     FRONTMATTER_POST = \
@@ -218,6 +212,7 @@ function set_mode_plain() {
     TAGS_POST = \
     INGREDIENT_LIST_POST = \
     INGREDIENT_POST = \
+    COOKWARE_LIST_POST = \
     COOKWARE_POST = \
     INGREDIENT_LIST_POST = \
     SECTION_POST = \
@@ -288,7 +283,7 @@ function set_mode_ansi(      CSI,\
 #    STEP_POST = STEP_POST NORMAL
 #    TEXT_PRE = WHITE TEXT_PRE
 #    TEXT_POST = TEXT_POST NORMAL
-    INGREDIENT_LIST_PRE = BRIGHT_CYAN INGREDIENT_LIST_PRE NORMAL
+    INGREDIENT_LIST_PRE = BRIGHT_WHITE INGREDIENT_LIST_PRE NORMAL
 #    INGREDIENT_LIST_POST = INGREDIENT_LIST_POST
     INGREDIENT_PRE = INGREDIENT_PRE CYAN
     INGREDIENT_POST = NORMAL INGREDIENT_POST
@@ -298,6 +293,10 @@ function set_mode_ansi(      CSI,\
     TIMER_POST = TIMER_POST NORMAL
     COOKWARE_ITEM_PRE = BRIGHT_GREEN COOKWARE_ITEM_PRE
     COOKWARE_ITEM_POST = COOKWARE_ITEM_POST NORMAL
+    COOKWARE_LIST_PRE = BRIGHT_WHITE COOKWARE_LIST_PRE NORMAL
+    COOKWARE_PRE = COOKWARE_PRE CYAN
+    COOKWARE_POST = NORMAL COOKWARE_POST
+#    COOKWARE_LIST_POST = COOKWARE_LIST_POST
 }
 
 function set_mode_html() {
