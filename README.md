@@ -24,3 +24,22 @@ or, if you have marked it as executable,
 ## why?
 
 Why not?
+
+## okay, how do I use it
+
+You can either invoke it with `awk` using ANSI output
+
+    $ awk -f cook.awk my_recipe.cook
+
+or to get a plaintext version:
+
+    $ awk -f -- --plain cook.awk my_recipe.cook other_recipe.cook
+
+or it will emit an HTML fragment suitable for inclusion in other HTML:
+
+    $ awk -f -- --html cook.awk *.cook > recipes.html
+
+If you want to page through the ANSI output,
+you can use `less -R` as your `$PAGER`
+
+    $ awk -f cook.awk my_recipe.cook | less -R
