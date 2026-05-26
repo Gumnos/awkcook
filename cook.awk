@@ -349,15 +349,21 @@ function set_mode(mode) {
     else if (mode == OUTPUT_HTML) set_mode_html()
 }
 
-function parse_options(options,        i) {
+function parse_options(options,        i, option) {
     for (i in options) {
         # print "Option", i, options[i]
+        if (options[i] ~ /--/) {
+            option = substr(options[i], 3)
+            if (option == OUTPUT_PLAIN) opt_mode = OUTPUT_PLAIN
+            else if (option == OUTPUT_ANSI) opt_mode = OUTPUT_ANSI
+            else if (option == OUTPUT_HTML) opt_mode = OUTPUT_HTML
+#        } else if (options[i] ~ /^-/) {
+        }
     }
 }
 
 BEGIN {
     USER = ENVIRON["USER"]
-    CMD_SHOW = cmd = "show"
     OUTPUT_PLAIN = "plain"
     OUTPUT_ANSI = "ansi"
     OUTPUT_HTML = "html"
@@ -369,8 +375,7 @@ BEGIN {
         if (s ~ /^-/) {
             options[length(options)] = s
         } else {
-            if (i==1) cmd = s
-            else actual_args[length(actual_args)] = s
+            actual_args[length(actual_args)] = s
         }
     }
     # reset the command-line arguments
