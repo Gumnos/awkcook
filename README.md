@@ -25,10 +25,14 @@ For ANSI colorized output:
 
     $ awk -f -- --ansi cook.awk my_recipe.cook other_recipe.cook
 
+Note the `--` required to tell `awk`
+that the following options are for the script,
+not for `awk` itself.
+
 If you want to page through the ANSI output,
 you can use `less -R` as your `$PAGER`
 
-    $ awk -f cook.awk my_recipe.cook | less -R
+    $ awk -f cook.awk -- --ansi my_recipe.cook | less -R
 
 Alternatively, it can emit an HTML fragment suitable for inclusion in other HTML:
 
