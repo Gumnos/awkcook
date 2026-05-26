@@ -466,15 +466,14 @@ reading_front_matter {
             tags[length(tags)] = tag
             next
         } else reading_tags = 0
-    } else {
-        if (match(uc, /^[A-Z][A-Z]*: */)) {
-            field = substr(uc, 1, RLENGTH-2)
-            if (field in expected_metadata) {
-                metadata[field] = rest_of($0)
-            }
-            next
-        } else warn("Unknown front-matter: " $0)
     }
+    if (match(uc, /^[A-Z][A-Z]*: */)) {
+        field = substr(uc, 1, RLENGTH-2)
+        if (field in expected_metadata) {
+            metadata[field] = rest_of($0)
+        }
+        next
+    } else warn("Unknown front-matter: " $0)
 }
 
 match($0, /[ \t]*--/) {
