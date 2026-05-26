@@ -1,3 +1,1 @@
-add support for HTML-fragment output
-gather emitted ingredients and emit the lists at the end
-gather emitted cookware and emit the lists at the end
+check output line-spacing in plain/ANSI text
