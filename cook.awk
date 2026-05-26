@@ -195,12 +195,13 @@ function end_recipe(        s, i, step_number, section_number) {
 
 function set_mode_plain() {
     OUTPUT_PRE = OUTPUT_POST = \
-    RECIPE_PRE = RECIPE_POST = \
+    RECIPE_PRE = \
     FRONTMATTER_PRE = \
     METADATA_LABEL_PRE = \
     METADATA_VALUE_PRE = \
     TAG_POST = \
     ""
+    RECIPE_POST = "\n\n"
 
     TAGS_PRE = "TAGS:"
     INGREDIENT_LIST_PRE = "\nIngredients:\n"
