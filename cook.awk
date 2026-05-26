@@ -368,7 +368,7 @@ BEGIN {
     OUTPUT_PLAIN = "plain"
     OUTPUT_ANSI = "ansi"
     OUTPUT_HTML = "html"
-    OUTPUT_DEFAULT = OUTPUT_ANSI
+    OUTPUT_DEFAULT = OUTPUT_PLAIN
 
     opt_mode = OUTPUT_DEFAULT
     for (i=1; i<ARGC; i++) {
