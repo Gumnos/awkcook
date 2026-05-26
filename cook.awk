@@ -34,8 +34,8 @@ function emit_front_matter(        i, field, tag) {
         field = expected_metadata_priorities[i]
         if (field in metadata) {
             printf("%s%s%s%s%s%s", \
-                METADATALABEL_PRE, field, METADATALABEL_POST, \
-                METADATA_PRE, metadata[field], METADATA_POST)
+                METADATA_LABEL_PRE, field, METADATA_LABEL_POST, \
+                METADATA_VALUE_PRE, metadata[field], METADATA_VALUE_POST)
         }
     }
     if (length(tags)) {
@@ -197,18 +197,18 @@ function set_mode_plain() {
     OUTPUT_PRE = OUTPUT_POST = \
     RECIPE_PRE = RECIPE_POST = \
     FRONTMATTER_PRE = \
-    METADATALABEL_PRE = \
-    METADATA_PRE = \
+    METADATA_LABEL_PRE = \
+    METADATA_VALUE_PRE = \
     TAG_POST = \
     ""
 
     TAGS_PRE = "TAGS:"
-    INGREDIENT_LIST_PRE = "Ingredients:\n"
-    COOKWARE_LIST_PRE = "Cookware:\n"
-    METADATALABEL_POST = ": "
+    INGREDIENT_LIST_PRE = "\nIngredients:\n"
+    COOKWARE_LIST_PRE = "\nCookware:\n"
+    METADATA_LABEL_POST = ": "
 
     FRONTMATTER_POST = \
-    METADATA_POST = \
+    METADATA_VALUE_POST = \
     TAGS_POST = \
     INGREDIENT_LIST_POST = \
     INGREDIENT_POST = \
@@ -225,7 +225,6 @@ function set_mode_plain() {
     SECTION_PRE = \
     SECTION_TEXT_PRE = \
     STEP_PRE = \
-    TEXT_PRE = \
     ""
 
     COOKWARE_PRE = \
@@ -267,10 +266,10 @@ function set_mode_ansi(      CSI,\
 #    RECIPE_POST = RECIPE_POST NORMAL
 #    FRONTMATTER_PRE = WHITE FRONTMATTER_PRE
 #    FRONTMATTER_POST = FRONTMATTER_POST NORMAL
-    METADATALABEL_PRE = BRIGHT_BLUE METADATALABEL_PRE
-    METADATALABEL_POST = METADATALABEL_POST NORMAL
-    METADATA_PRE = WHITE METADATA_PRE
-    METADATA_POST = METADATA_POST NORMAL
+    METADATA_LABEL_PRE = BRIGHT_BLUE METADATA_LABEL_PRE
+    METADATA_LABEL_POST = METADATA_LABEL_POST NORMAL
+    METADATA_VALUE_PRE = WHITE METADATA_VALUE_PRE
+    METADATA_VALUE_POST = METADATA_VALUE_POST NORMAL
     TAGS_PRE = BRIGHT_BLUE TAGS_PRE NORMAL
 #    TAGS_POST = TAGS_POST NORMAL
 #    TAG_PRE = WHITE TAG_PRE
@@ -281,8 +280,6 @@ function set_mode_ansi(      CSI,\
     SECTION_TEXT_POST = SECTION_TEXT_POST NORMAL
 #    STEP_PRE = WHITE STEP_PRE
 #    STEP_POST = STEP_POST NORMAL
-#    TEXT_PRE = WHITE TEXT_PRE
-#    TEXT_POST = TEXT_POST NORMAL
     INGREDIENT_LIST_PRE = BRIGHT_WHITE INGREDIENT_LIST_PRE NORMAL
 #    INGREDIENT_LIST_POST = INGREDIENT_LIST_POST
     INGREDIENT_PRE = INGREDIENT_PRE CYAN
@@ -300,26 +297,50 @@ function set_mode_ansi(      CSI,\
 }
 
 function set_mode_html() {
-    # TODO
-    OUTPUT_PRE = OUTPUT_POST = \
-    RECIPE_PRE = RECIPE_POST = \
-    FRONTMATTER_PRE = FRONTMATTER_POST = \
-    METADATALABEL_PRE = METADATALABEL_POST = \
-    METADATA_PRE = METADATA_POST = \
-    TAGS_PRE = TAGS_POST = \
-    TAG_PRE = TAG_POST = \
-    SECTION_PRE = SECTION_POST = \
-    SECTION_TEXT_PRE = SECTION_TEXT_POST = \
-    STEP_PRE = STEP_POST = \
-    TEXT_PRE = TEXT_POST = \
-    INGREDIENT_LIST_PRE = INGREDIENT_LIST_POST = \
-    INGREDIENT_PRE = INGREDIENT_POST = \
-    INGREDIENT_INLINE_PRE = INGREDIENT_INLINE_POST = \
-    COOKWARE_ITEM_PRE = COOKWARE_ITEM_POST = \
-    TIMER_PRE = TIMER_POST = \
-    COOKWARE_PRE = COOKWARE_POST = \
-    X_PRE = X_POST = \
+    OUTPUT_PRE = \
+    OUTPUT_POST = \
     ""
+    RECIPE_PRE = "<article>"
+    RECIPE_POST = "</article>"
+    FRONTMATTER_PRE = "<section><dl>"
+    FRONTMATTER_POST = "</dl></section>\n"
+
+    METADATA_LABEL_PRE = "<dt>"
+    METADATA_LABEL_POST = "</dt>"
+    METADATA_VALUE_PRE = "<dd>"
+    METADATA_VALUE_POST = "</dd>\n"
+
+    TAGS_PRE = "<ul>"
+    TAGS_POST = "</ul>"
+    TAG_PRE = "<li>"
+    TAG_POST = "</li>\n"
+    INGREDIENT_LIST_PRE = "<h3>Ingredients</h3><ul>\n"
+    INGREDIENT_LIST_POST = "</ul>"
+    COOKWARE_LIST_PRE = "<h3>Cookware</h3><ul>\n"
+    COOKWARE_LIST_POST = "</ul>"
+
+    SECTION_PRE = "<section>"
+    SECTION_POST = "</section>"
+    SECTION_TEXT_PRE = "<h3>"
+    SECTION_TEXT_POST = "</h3>"
+
+    STEP_PRE = "<p>"
+    STEP_POST = "</p>\n"
+
+    INGREDIENT_PRE = "<li>"
+    INGREDIENT_POST = "</li>\n"
+
+    COOKWARE_PRE = "<li>"
+    COOKWARE_POST = "</li>\n"
+
+    INGREDIENT_INLINE_PRE = "<em class='ingredient'>"
+    TIMER_PRE = "<em class='timer'>"
+    COOKWARE_ITEM_PRE = "<em class='cookware'>"
+
+    INGREDIENT_INLINE_POST = \
+    TIMER_POST = \
+    COOKWARE_ITEM_POST = \
+    "</em>"
 }
 
 function set_mode(mode) {
